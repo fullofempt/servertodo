@@ -1,0 +1,18 @@
+version: "3"
+volumes: 
+    mongo_volume:
+services: 
+    mongo:
+        build: mongo
+        restart: always
+        ports: 
+            - "27017:27000"
+        volumes: 
+            - mongo_volume:/data/db
+        environment: 
+            - MONGO_INITDB_ROOT_USERNAME=root
+            - MONGO_INITDB_ROOT_PASSWORD=root
+        logging: 
+            options: 
+                max-size: 10m
+        
