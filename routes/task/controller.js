@@ -7,7 +7,7 @@ const TaskModel = require('../../models/task')
 const UserModel = require('../../models/user')
 const { Types } = require('mongoose')
 //* Key
-//? id задач лучше откуда-то подхватывать но я не додумаюсь как это сделать сейчас
+//? id задач лучше откуда-то подхватывать но я не додумаюсь как это сделать
 async function getUserTaskList(req, res) {
     try {
         const user = req.jwtUserData
