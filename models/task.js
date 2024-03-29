@@ -9,6 +9,10 @@ const TaskSchema = new Schema({
     datetime: {
         type: Schema.Types.Date,
     },
+    userId: {
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+    },
     isDone: {
         type: Schema.Types.Boolean,
     },
