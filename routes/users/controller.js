@@ -5,8 +5,6 @@ const jwt = require('jsonwebtoken')
 const fs = require('fs');
 //* Models
 const UserModel = require('../../models/user')
-const AccessTokenModel = require('../../models/AccessToken')
-const MaskModel = require('../../models/Mask')
 const { Types } = require('mongoose')
 //* Key
 

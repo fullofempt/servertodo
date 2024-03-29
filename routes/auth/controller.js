@@ -1,5 +1,4 @@
 //* Modules
-const moment = require('moment')
 const crypto = require('crypto-js')
 const jwt = require('jsonwebtoken')
 const fs = require('fs');
@@ -13,7 +12,7 @@ function createTokens(user) {
     var access = jwt.sign({
         id: user._id
     }, process.env.PRIVATE_KEY, {
-        expiresIn: '30s'
+        expiresIn: '30m'
     })
     var refresh = jwt.sign({
         id: user._id,
@@ -43,10 +42,11 @@ async function login(req, res) {
     try {
         const username = req.body.username;
         const pass = req.body.password;
-        const findedUser = await UserModel.find({ username });
+        const findedUser = await UserModel.findOne({ username });
         if (!findedUser)
             throw 'Incorrect login'
-        const isValidPass = CryptoJS.AES.encrypt(pass) === findedUser.password;
+        const isValidPass = crypto.HmacSHA256(pass, process.env.PRIVATE_KEY).toString() === findedUser.password;
+        
         if (!isValidPass)
             throw 'Invalid password';
         const tokens = createTokens(findedUser)
@@ -62,9 +62,10 @@ async function registration(req, res) {
     try {
         const username = req.body.username;
         const password = req.body.password;
-        const hashPass = CryptoJS.AES.encrypt(password, 'secretkey');
+        const hashPass = crypto.HmacSHA256(password, process.env.PRIVATE_KEY);
 
-        const findedUser = await UserModel.find({ username })
+        const findedUser = await UserModel.findOne({ username })
+        console.log(findedUser)
         if (findedUser) {
             return res.status(401).send('User already exist')
         }

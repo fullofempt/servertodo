@@ -1,14 +1,16 @@
+const jwt = require('jsonwebtoken')
+const UserModel = require('../models/user')
 
 function jwtMiddleware(req, res, next) {
     try {
         console.log('Time:', Date.now());
-        //! ACCESS всегда передается в Headers
-        const access = req.headers.authorization
+        const access = req.headers.authorization.split(" ")[1]
         if (!access) throw "Unauthorized"
-        let verified = jwt.verified(access, process.env.PRIVATE_KEY)
+        let verified = jwt.verify(access, process.env.PRIVATE_KEY)
         if (!verified) throw "Unauthorized"
-        const findedUser = UserModel.findById(verified.id)
+        const findedUser = UserModel.findById(verified.id).populate('tasks', 'categories')
         if (!findedUser) return res.status(404).send('User not found')
+        req.jwtUserData = findedUser
         next();
     } catch (error) {
         console.log(error)

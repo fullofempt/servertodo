@@ -8,9 +8,10 @@ App.use(express.urlencoded({ extended: true }))
 App.use('/api', routes);
 
 
-const { MONGO_USERNAME, MONGO_PASSWORD, MONGO_HOST, MONGO_PORT } = process.env
+const { MONGO_USERNAME, MONGO_PASSWORD, MONGO_HOST, MONGO_PORT, HOST_PORT } = process.env
 
-App.listen(3031, async () => {
+App.listen(HOST_PORT, async () => {
     await mongo.connect(`mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@${MONGO_HOST}:${MONGO_PORT}/`,
         { useNewUrlParser: true, useUnifiedTopology: true })
+    console.log(`http://localhost:${HOST_PORT}`)
 });
