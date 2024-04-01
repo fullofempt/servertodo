@@ -5,8 +5,6 @@ const jwt = require('jsonwebtoken')
 const fs = require('fs');
 //* Models
 const UserModel = require('../../models/user')
-const AccessTokenModel = require('../../models/AccessToken')
-const MaskModel = require('../../models/Mask')
 const { Types } = require('mongoose')
 //* Key
 
@@ -28,16 +26,56 @@ async function GetUserProfile(req, res) {
 }
 
 
-
-//? Авторизация
+//? Авторизация вроде сделал, fullofempt
 async function Authorization(req, res) {
-        
+    try {
+        const { login, password } = req.body;
+        const user = await UserModel.findOne({ login });
+        if (!user) {
+            return res.status(404).json({ message: 'Пользователь не найден' });
+        }
+        // валидность пароля
+        const isPasswordValid = crypto.SHA256(password).toString() === user.password;
+        if (!isPasswordValid) {
+            return res.status(401).json({ message: 'Неверный пароль' });
+        }
+        // создаем JWT токен
+        const token = jwt.sign({ login: user.login }, secretKey, { expiresIn: '1h' });
+
+        return res.status(200).json({ token });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ message: 'Internal Server Error' });
+    }
 }
 
-//? Регистрация
+//? Регистрация вроде сделаль, fullofempt
 async function Registration(req, res) {
+    try {
+        const { login, password, email } = req.body;
+
+        // Проверка пользователя
+        const existingUser = await UserModel.findOne({ login });
+        if (existingUser) {
+            return res.status(400).json({ message: 'User with this login already exists' });
+        }
+        // создание нового пользователя
+        const newUser = new UserModel({
+            login,
+            password: crypto.SHA256(password).toString(), // хеширование пароля
+            email
+        });
+        await newUser.save();
+        return res.status(201).json({ message: 'User created successfully' });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ message: 'Internal Server Error' });
+    }
 }
 
-//* Export 
+//* Export test
 module.exports = {
+    GetUserProfile,
+    Authorization,
+    Registration
 }
