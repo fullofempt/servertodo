@@ -2,6 +2,7 @@
 const crypto = require('crypto-js')
 const jwt = require('jsonwebtoken')
 const fs = require('fs');
+const jwtDoc = require('../../middleware/json_middleware')
 //* Models
 const TaskModel = require('../../models/task')
 const UserModel = require('../../models/user')
@@ -13,7 +14,8 @@ async function getUserTaskList(req, res) {
         const user = req.jwtUserData
         const taskIds = user.tasks
         const tasks = await TaskModel.find({ _id: { $in: taskIds } })
-        return res.json(tasks)
+        const result = jwtDoc.toJSON(tasks)
+        return res.json(result)
 
     } catch (error) {
         console.log(error)
